@@ -1,0 +1,63 @@
+diff -aru --new-file original/build.gradle edited/build.gradle
+--- original/build.gradle	2020-10-20 13:18:24.000000000 -0400
++++ edited/build.gradle	2020-10-20 09:52:12.000000000 -0400
+@@ -5,7 +5,7 @@
+ }
+ 
+ group = 'io.steeltoe.docker'
+-version = '0.0.1-SNAPSHOT'
++version = '2.2.5'
+ sourceCompatibility = '11'
+ 
+ repositories {
+diff -aru --new-file original/src/main/java/io/steeltoe/docker/configserver/ConfigServer.java edited/src/main/java/io/steeltoe/docker/configserver/ConfigServer.java
+--- original/src/main/java/io/steeltoe/docker/configserver/ConfigServer.java	2020-10-20 13:18:24.000000000 -0400
++++ edited/src/main/java/io/steeltoe/docker/configserver/ConfigServer.java	2020-10-20 09:53:37.000000000 -0400
+@@ -1,12 +1,23 @@
+ package io.steeltoe.docker.configserver;
+ 
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
+ import org.springframework.boot.SpringApplication;
+ import org.springframework.boot.autoconfigure.SpringBootApplication;
++import org.springframework.cloud.config.server.EnableConfigServer;
++import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+ 
+ @SpringBootApplication
++@EnableConfigServer
++@EnableEurekaClient
+ public class ConfigServer {
+ 
++ 	private static final Logger logger = LoggerFactory.getLogger(ConfigServer.class);
++
+ 	public static void main(String[] args) {
++ 		System.setProperty("spring.config.name", "configserver");
++		Package pkg = EnableConfigServer.class.getPackage();
++		logger.info("{} {} by {}", pkg.getImplementationTitle(), pkg.getImplementationVersion(), pkg.getImplementationVendor());
+ 		SpringApplication.run(ConfigServer.class, args);
+ 	}
+ 
+diff -aru --new-file original/src/main/resources/application.properties edited/src/main/resources/application.properties
+--- original/src/main/resources/application.properties	2020-10-20 13:18:24.000000000 -0400
++++ edited/src/main/resources/application.properties	1969-12-31 19:00:00.000000000 -0500
+@@ -1 +0,0 @@
+-
+diff -aru --new-file original/src/main/resources/application.yaml edited/src/main/resources/application.yaml
+--- original/src/main/resources/application.yaml	1969-12-31 19:00:00.000000000 -0500
++++ edited/src/main/resources/application.yaml	2020-10-20 10:28:30.000000000 -0400
+@@ -0,0 +1,5 @@
++server:
++  port: 8888
++spring:
++  application:
++    name: configserver
+diff -aru --new-file original/src/main/resources/boot.yaml edited/src/main/resources/boot.yaml
+--- original/src/main/resources/boot.yaml	1969-12-31 19:00:00.000000000 -0500
++++ edited/src/main/resources/boot.yaml	2020-10-20 09:50:06.000000000 -0400
+@@ -0,0 +1,6 @@
++cloud:
++  config:
++    discovery:
++      enabled: true
++      service-id: configserver
++    enabled: true

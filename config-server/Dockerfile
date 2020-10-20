@@ -12,14 +12,14 @@ RUN http https://start.spring.io/starter.zip \
         groupId==io.steeltoe.docker \
         artifactId==configserver \
         applicationName==ConfigServer \
-        dependencies==cloud-config-server \
+        dependencies==cloud-config-server,cloud-eureka \
         --output configserver.zip
 RUN mkdir configserver && unzip -d configserver configserver.zip
 COPY patches patches
 RUN for patch in patches/*.patch; do \
         echo "applying patch $(basename $patch)"; \
         cd configserver; \
-        patch -p1 < ../$patch; \
+        patch -p1 -E < ../$patch; \
         cd ..; \
         done
 RUN configserver/gradlew bootJar --project-dir configserver --no-daemon
